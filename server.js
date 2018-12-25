@@ -5,6 +5,8 @@ var cors = require('cors');
 
 var multer = require('multer');
 // require and use "multer"...
+var storage = multer.memoryStorage();
+var upload = multer({storage: storage});
 
 var app = express();
 
@@ -15,9 +17,24 @@ app.get('/', function (req, res) {
      res.sendFile(process.cwd() + '/views/index.html');
   });
 
+app.post('/api/fileanalyse', upload.single('upfile'), function(req, res){
+  res.json({
+    'name': req.file.originalname,
+    'type': req.file.mimetype,
+    'size': req.file.size
+  });
+});
+
 app.get('/hello', function(req, res){
   res.json({greetings: "Hello, API"});
 });
+
+ // 404-NOT FOUND Middleware
+ app.use(function(req, res, next){
+  res.status(404);
+  res.type('txt').send('Not found');
+});
+
 
 app.listen(process.env.PORT || 3000, function () {
   console.log('Node.js listening ...');
